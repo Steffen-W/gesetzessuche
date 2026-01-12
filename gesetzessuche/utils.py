@@ -73,7 +73,7 @@ def parse_law_reference(reference: str) -> LawReference | None:
     # Pattern to match various reference formats
     # Matches: Optional law code, § or Artikel/Art., paragraph number, optional Absatz, Nummer, Buchstabe, Satz
     pattern = r"""
-        (?:([A-Z][A-Za-z]*[A-Z]|[A-Z]{2,})\s+)?  # Optional law code (e.g., BGB, GmbHG, KStG)
+        (?:([A-ZÄÖÜ][A-Za-zäöüß]*[A-ZÄÖÜ]|[A-ZÄÖÜ]{2,})\s+)?  # Optional law code (e.g., BGB, GmbHG, KStG, AAÜG)
         (?:§|Artikel|Art\.?)\s*                  # Paragraph marker
         (\d+[a-z]?)                               # Paragraph number (e.g., 52, 8b)
         (?:\s+(?:Absatz|Abs\.?)\s+(\d+))?         # Optional section (Absatz)
@@ -605,34 +605,53 @@ def get_law(
     if not xml_path.exists():
         if auto_download:
             logger.info(f"XML file not found for '{law_code}', attempting download...")
-            toc_index = load_toc_index(base_path)
-            toc_entry = find_law_in_toc(law_code, toc_index)
 
-            if toc_entry:
+            # If law is in mapping, use url_path from mapping for download
+            if law_info.get("url_path"):
+                url_path = law_info["url_path"]
+                download_url = f"https://www.gesetze-im-internet.de/{url_path}/xml.zip"
+                logger.info(f"Using URL from mapping: {download_url}")
+
                 target_dir = base_path / "data"
-                result = download_and_extract_law(toc_entry["url"], target_dir)
+                result = download_and_extract_law(download_url, target_dir)
 
                 if result:
                     xml_path_new, jurabk = result
-                    builddate = extract_builddate_from_xml(xml_path_new)
-
-                    # Update mapping with fresh download info
-                    mapping[jurabk] = {
-                        "filename": xml_path_new.name,
-                        "title": toc_entry["title"],
-                        "category": toc_entry.get("category", ""),
-                        "builddate": builddate or "",
-                        "url_path": toc_entry.get("url_path", ""),
-                    }
-                    save_law_mapping(mapping, base_path)
                     xml_path = xml_path_new
                     logger.info(f"Successfully downloaded '{law_code}'")
                 else:
                     logger.error(f"Failed to download '{law_code}'")
                     return None
             else:
-                logger.error(f"Law '{law_code}' not found in TOC for download")
-                return None
+                # Fallback: search in TOC
+                toc_index = load_toc_index(base_path)
+                toc_entry = find_law_in_toc(law_code, toc_index)
+
+                if toc_entry:
+                    target_dir = base_path / "data"
+                    result = download_and_extract_law(toc_entry["url"], target_dir)
+
+                    if result:
+                        xml_path_new, jurabk = result
+                        builddate = extract_builddate_from_xml(xml_path_new)
+
+                        # Update mapping with fresh download info
+                        mapping[jurabk] = {
+                            "filename": xml_path_new.name,
+                            "title": toc_entry["title"],
+                            "category": toc_entry.get("category", ""),
+                            "builddate": builddate or "",
+                            "url_path": toc_entry.get("url_path", ""),
+                        }
+                        save_law_mapping(mapping, base_path)
+                        xml_path = xml_path_new
+                        logger.info(f"Successfully downloaded '{law_code}'")
+                    else:
+                        logger.error(f"Failed to download '{law_code}'")
+                        return None
+                else:
+                    logger.error(f"Law '{law_code}' not found in TOC for download")
+                    return None
         else:
             logger.error(f"XML file not found: {xml_path}")
             return None
