@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gesetzessuche"
+version = "0.1.0"
+description = "Search and access German federal laws - MCP Server & Python Library"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Steffen-W", email = "steffen-w@users.noreply.github.com"}
+]
+keywords = ["mcp", "law", "german", "gesetze", "legal", "documents"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Markup :: XML",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "pydantic>=2.0.0",
+    "fastmcp>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.0.0",
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Steffen-W/gesetzessuche"
+Repository = "https://github.com/Steffen-W/gesetzessuche"
+Documentation = "https://github.com/Steffen-W/gesetzessuche#readme"
+"Bug Tracker" = "https://github.com/Steffen-W/gesetzessuche/issues"
+
+[project.scripts]
+gesetzessuche = "gesetzessuche.cli:main"
+gesetzessuche-download = "gesetzessuche.download:main"
+
+[tool.setuptools]
+packages = ["gesetzessuche"]
+
+[tool.setuptools.package-data]
+gesetzessuche = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
