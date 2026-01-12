@@ -601,9 +601,41 @@ def get_law(
     law_info = mapping[law_key]
     xml_path = base_path / "data" / law_info["filename"]
 
+    # If XML file doesn't exist, try to download if auto_download is enabled
     if not xml_path.exists():
-        logger.error(f"XML file not found: {xml_path}")
-        return None
+        if auto_download:
+            logger.info(f"XML file not found for '{law_code}', attempting download...")
+            toc_index = load_toc_index(base_path)
+            toc_entry = find_law_in_toc(law_code, toc_index)
+
+            if toc_entry:
+                target_dir = base_path / "data"
+                result = download_and_extract_law(toc_entry["url"], target_dir)
+
+                if result:
+                    xml_path_new, jurabk = result
+                    builddate = extract_builddate_from_xml(xml_path_new)
+
+                    # Update mapping with fresh download info
+                    mapping[jurabk] = {
+                        "filename": xml_path_new.name,
+                        "title": toc_entry["title"],
+                        "category": toc_entry.get("category", ""),
+                        "builddate": builddate or "",
+                        "url_path": toc_entry.get("url_path", ""),
+                    }
+                    save_law_mapping(mapping, base_path)
+                    xml_path = xml_path_new
+                    logger.info(f"Successfully downloaded '{law_code}'")
+                else:
+                    logger.error(f"Failed to download '{law_code}'")
+                    return None
+            else:
+                logger.error(f"Law '{law_code}' not found in TOC for download")
+                return None
+        else:
+            logger.error(f"XML file not found: {xml_path}")
+            return None
 
     # Parse and return
     try:

@@ -49,8 +49,8 @@ def test_get_law_reference():
     assert parsed is not None
     assert parsed["law"] == "HGB"
 
-    # Load law
-    dokumente = get_law(parsed["law"], auto_download=False)
+    # Load law (auto-download if missing)
+    dokumente = get_law(parsed["law"], auto_download=True)
     assert dokumente is not None
 
     # Create search instance
@@ -77,8 +77,8 @@ def test_get_law_reference_with_absatz():
     parsed = parse_law_reference(reference)
     assert parsed is not None
 
-    # Load law
-    dokumente = get_law(parsed["law"], auto_download=False)
+    # Load law (auto-download if missing)
+    dokumente = get_law(parsed["law"], auto_download=True)
     assert dokumente is not None
 
     # Create search instance
@@ -100,7 +100,7 @@ def test_list_paragraphs():
     print("Testing list_paragraphs('HGB', limit=5)...")
 
     # Load law
-    dokumente = get_law("HGB", auto_download=False)
+    dokumente = get_law("HGB", auto_download=True)
     assert dokumente is not None
 
     # Create search instance
@@ -134,7 +134,7 @@ def test_search_law():
     print("Testing search_law('HGB', 'Handelsregister', max_results=3)...")
 
     # Load law
-    dokumente = get_law("HGB", auto_download=False)
+    dokumente = get_law("HGB", auto_download=True)
     assert dokumente is not None
 
     # Create search instance
@@ -169,7 +169,7 @@ def test_search_law():
 def test_error_handling():
     """Test error handling for non-existent law"""
     print("Testing error handling with non-existent law...")
-    dokumente = get_law("NONEXISTENT", auto_download=False)
+    dokumente = get_law("NONEXISTENT", auto_download=True)
     assert dokumente is None, "Expected None for non-existent law"
     print("  ✓ Error handling works correctly (returns None)")
     print()

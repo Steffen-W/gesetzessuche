@@ -132,14 +132,14 @@ Examples:
             return 1
         law_to_load = args.gesetz
 
-    # Load law document
+    # Load law document (auto-download if missing)
     print(f"📖 Loading {law_to_load}...", end=" ", flush=True)
-    documents = get_law(law_to_load)
+    documents = get_law(law_to_load, auto_download=True)
 
     if not documents:
         print(" ❌")
         print(f"\n❌ Law '{law_to_load}' not found!")
-        print("Run: python download_all_laws.py --essential")
+        print("Run: gesetzessuche-download --essential")
         return 1
 
     print(" ✓")
