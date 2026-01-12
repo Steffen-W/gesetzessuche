@@ -136,15 +136,30 @@ def load_law_mapping(base_path: Optional[Path] = None) -> dict[str, LawMapping]:
     Load law mapping from law_mapping.json.
 
     Args:
-        base_path: Base directory containing law_mapping.json (default: project root)
+        base_path: Base directory containing law_mapping.json (default: ~/.gesetzessuche)
 
     Returns:
         Dictionary mapping law codes (jurabk) to law info
     """
     if base_path is None:
-        base_path = Path(__file__).parent.parent
+        # Use user's home directory for data storage
+        base_path = Path.home() / ".gesetzessuche"
+        base_path.mkdir(exist_ok=True)
+        mapping_file = base_path / "law_mapping.json"
 
-    mapping_file = base_path / "law_mapping.json"
+        # If not exists in user dir, copy from package (for first-time setup)
+        if not mapping_file.exists():
+            package_mapping = Path(__file__).parent / "law_mapping.json"
+            if package_mapping.exists():
+                import shutil
+
+                shutil.copy2(package_mapping, mapping_file)
+                logger.info(f"Initialized law_mapping.json in {base_path}")
+            else:
+                logger.warning(f"Law mapping file not found: {mapping_file}")
+                return {}
+    else:
+        mapping_file = base_path / "law_mapping.json"
 
     if not mapping_file.exists():
         logger.warning(f"Law mapping file not found: {mapping_file}")
@@ -168,13 +183,14 @@ def save_law_mapping(
 
     Args:
         mapping: Dictionary mapping law codes to law info
-        base_path: Base directory for law_mapping.json (default: project root)
+        base_path: Base directory for law_mapping.json (default: ~/.gesetzessuche)
 
     Returns:
         True if successful, False otherwise
     """
     if base_path is None:
-        base_path = Path(__file__).parent.parent
+        base_path = Path.home() / ".gesetzessuche"
+        base_path.mkdir(exist_ok=True)
 
     mapping_file = base_path / "law_mapping.json"
 
@@ -532,7 +548,9 @@ def get_law(
     from .parser import parse_gesetz
 
     if base_path is None:
-        base_path = Path(__file__).parent.parent
+        # Use user's home directory for data storage
+        base_path = Path.home() / ".gesetzessuche"
+        base_path.mkdir(exist_ok=True)
 
     # Load mapping and find law
     mapping = load_law_mapping(base_path)

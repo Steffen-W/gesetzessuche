@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 
 def download_all_laws(skip_existing: bool = True) -> dict[str, int | str]:
     """Download all laws and create mapping file."""
-    # base_path is the project root (parent of gesetzessuche package)
-    base_path = Path(__file__).parent.parent
+    # Use user's home directory for data storage
+    base_path = Path.home() / ".gesetzessuche"
+    base_path.mkdir(exist_ok=True)
     toc_index = load_toc_index(base_path)
     target_dir = base_path / "data"
     toc_entries = list(toc_index.items())
@@ -100,7 +101,9 @@ def download_essential_laws() -> dict[str, int | str]:
         "zpo",
     ]
 
-    base_path = Path(__file__).parent.parent
+    # Use user's home directory for data storage
+    base_path = Path.home() / ".gesetzessuche"
+    base_path.mkdir(exist_ok=True)
     toc_index = load_toc_index(base_path)
     target_dir = base_path / "data"
 

@@ -1,14 +1,14 @@
 # Gesetzessuche
 
-Python-Bibliothek und MCP-Server für komfortablen Zugriff auf >6400 deutsche Bundesgesetze von gesetze-im-internet.de.
+Python-Bibliothek und MCP-Server für komfortablen Zugriff auf >6400 deutsche Bundesgesetze von [gesetze-im-internet.de](https://www.gesetze-im-internet.de).
 
-## 🚀 Schnellstart
+## Schnellstart
 
 ### Installation
 
 ```bash
-# Von PyPI (wenn veröffentlicht)
-pip install gesetzessuche
+# Direkt von GitHub
+pip install git+https://github.com/Steffen-W/gesetzessuche
 
 # Oder von Source (Development)
 git clone https://github.com/Steffen-W/gesetzessuche.git
@@ -40,7 +40,7 @@ gesetzessuche AktG --liste              # Alle Paragraphen
 gesetzessuche HGB --suche "Handelsregister"  # Volltextsuche
 ```
 
-## 🔧 MCP Server
+## MCP Server
 
 **Claude Desktop Config** (`~/.config/Claude/claude_desktop_config.json`):
 
@@ -62,7 +62,7 @@ gesetzessuche HGB --suche "Handelsregister"  # Volltextsuche
 - **`list_paragraphs(law)`** - Paragraphen-Übersicht
 - **`list_laws()`** - Alle verfügbaren Gesetze
 
-## 💻 Python API
+## Python API
 
 ```python
 from gesetzessuche import LawSearch, get_law
@@ -85,7 +85,7 @@ for result in results:
 paragraphs = search.list_all_paragraphs()
 ```
 
-## 📁 Projektstruktur
+## Projektstruktur
 
 ```
 gesetzessuche/
@@ -104,7 +104,7 @@ gesetzessuche/
 └── pyproject.toml         # Package configuration
 ```
 
-## 📚 Verfügbare Gesetze
+## Verfügbare Gesetze
 
 Nach `gesetzessuche-download --essential`:
 
@@ -120,7 +120,7 @@ Nach `gesetzessuche-download --essential`:
 
 Vollständige Liste: `law_mapping.json`
 
-## 🧪 Tests
+## Tests
 
 ```bash
 python tests/test_parser.py
@@ -128,8 +128,8 @@ python tests/test_mcp_server.py
 python tests/test_mcp_cache.py
 ```
 
-## 📜 Lizenz
+## Lizenz
 
 - **Gesetzestexte**: Public Domain (Bundesministerium der Justiz)
 - **Software**: MIT License
-- **Quelle**: https://www.gesetze-im-internet.de
+- **Quelle**: [gesetze-im-internet.de](https://www.gesetze-im-internet.de)
