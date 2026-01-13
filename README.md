@@ -3,6 +3,7 @@
 Python-Bibliothek und MCP-Server für komfortablen Zugriff auf deutsches Bundesrecht von [gesetze-im-internet.de](https://www.gesetze-im-internet.de).
 
 **Verfügbar:** >1500 Gesetze, >2900 Verordnungen, >900 Abkommen, >500 Bekanntmachungen (~6500 Dokumente)
+Siehe [gesetzessuche/law_mapping.json](gesetzessuche/law_mapping.json) für die vollständige Liste.
 
 ## Beispiele
 
@@ -48,23 +49,46 @@ pip install -e .
 ```bash
 # Gesetze herunterladen (einmalig)
 gesetzessuche-download --essential
+```
 
-# CLI nutzen (nach Installation)
-gesetzessuche -r "BGB § 1"
-gesetzessuche -r "KStG § 6 Absatz 1"
-gesetzessuche -r "HGB § 1 Absatz 1 Satz 1"
+**CLI Hilfe:**
 
-# Oder als Python-Modul (ohne Installation)
-python -m gesetzessuche.cli -r "BGB § 1"
-python -m gesetzessuche.download --essential
+```
+$ gesetzessuche -h
 
-# Alternative Syntax
-gesetzessuche BGB --paragraph 1
-gesetzessuche KStG --paragraph 8b --absatz 2
+usage: gesetzessuche [-h] [-p PARAGRAPH] [-a ABSATZ] [-r REFERENCE] [-s SUCHE]
+                     [--case-sensitive] [-l]
+                     [gesetz]
 
-# Weitere Funktionen
-gesetzessuche AktG --liste              # Alle Paragraphen
-gesetzessuche HGB --suche "Handelsregister"  # Volltextsuche
+Search German law documents
+
+positional arguments:
+  gesetz                Law code (e.g., AktG, HGB, BGB) - optional if
+                        --reference includes law code
+
+options:
+  -h, --help            show this help message and exit
+  -p PARAGRAPH, --paragraph PARAGRAPH
+                        Show specific paragraph (e.g., 1, 8b)
+  -a ABSATZ, --absatz ABSATZ
+                        Show specific section (requires --paragraph)
+  -r REFERENCE, --reference REFERENCE
+                        Parse reference string (e.g., "§ 1", "§ 8b Absatz 2",
+                        "§ 1 Absatz 1 Satz 1")
+  -s SUCHE, --suche SUCHE
+                        Search for a term in the law
+  --case-sensitive      Case-sensitive search (default: case-insensitive)
+  -l, --liste           List all paragraphs
+
+Examples:
+  gesetzessuche AktG                             # Show law info
+  gesetzessuche AktG --liste                     # List all paragraphs
+  gesetzessuche AktG --paragraph 1               # Show paragraph 1
+  gesetzessuche KStG --paragraph 8b --absatz 2   # Show specific section
+  gesetzessuche --reference "BGB § 1"            # Use reference with law code
+  gesetzessuche -r "KStG § 8b Absatz 2"          # Reference with law code
+  gesetzessuche BGB --reference "§ 1"            # Reference without law code
+  gesetzessuche AktG --suche "Aufsichtsrat"      # Search for term
 ```
 
 ## MCP Server
@@ -118,16 +142,18 @@ paragraphs = search.list_all_paragraphs()
 gesetzessuche/
 ├── gesetzessuche/          # Python Package
 │   ├── __init__.py        # Public API
+│   ├── __version__.py     # Version info
 │   ├── cli.py            # CLI entry point
 │   ├── server.py         # MCP server entry point
 │   ├── download.py       # Download entry point
 │   ├── models.py         # Pydantic Models
 │   ├── parser.py         # XML Parser
 │   ├── search.py         # Search & Query API
-│   └── utils.py          # Utilities
+│   ├── formatting.py     # Text formatting utilities
+│   ├── utils.py          # Utilities
+│   └── law_mapping.json  # Law index
 ├── tests/                 # Test suite
 ├── data/                  # Downloaded laws (XML)
-├── law_mapping.json       # Law index
 └── pyproject.toml         # Package configuration
 ```
 
@@ -145,15 +171,7 @@ Nach `gesetzessuche-download --essential`:
 - **ArbZG** - Arbeitszeitgesetz
 - Und viele mehr...
 
-Vollständige Liste: `law_mapping.json`
-
-## Tests
-
-```bash
-python tests/test_parser.py
-python tests/test_mcp_server.py
-python tests/test_mcp_cache.py
-```
+Vollständige Liste: [gesetzessuche/law_mapping.json](gesetzessuche/law_mapping.json)
 
 ## Lizenz
 
