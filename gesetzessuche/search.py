@@ -8,8 +8,9 @@ Provides the LawSearch class for:
 - Displaying law information
 """
 
-from .models import Dokumente, Norm, P, SearchResult
-from .utils import extract_text_from_norm, extract_text_from_p, parse_law_reference
+from .models import Dokumente, Norm, P, DL, SearchResult
+from .utils import parse_law_reference, extract_text_from_norm
+from .formatting import format_p_element, format_norm_content
 
 
 class LawSearch:
@@ -42,18 +43,18 @@ class LawSearch:
 
         result = []
 
-        # Header
+        # Header - compact format
         enbez = norm.metadaten.enbez or "?"
-        result.append(f"{'=' * 70}")
-        result.append(f"{self.law_code} {enbez}")
-
         if norm.metadaten.titel:
-            result.append(f"{norm.metadaten.titel}")
+            result.append(f"{self.law_code} {enbez} - {norm.metadaten.titel}")
+        else:
+            result.append(f"{self.law_code} {enbez}")
+        result.append("=" * 70)
 
-        result.append(f"{'=' * 70}")
-
-        if show_full_text:
-            text = extract_text_from_norm(norm)
+        if show_full_text and norm.metadaten.enbez:
+            # Get paragraph number for formatting
+            paragraph_num = norm.metadaten.enbez.replace("§", "").strip()
+            text = format_norm_content(norm, paragraph_num)
             if text:
                 result.append("")
                 result.append(text)
@@ -135,13 +136,53 @@ class LawSearch:
             if isinstance(item, P):
                 section_count += 1
                 if section_count == target_section:
-                    enbez = norm.metadaten.enbez if norm.metadaten else "?"
+                    enbez = (
+                        norm.metadaten.enbez
+                        if norm.metadaten and norm.metadaten.enbez
+                        else "?"
+                    )
+
+                    # Extract intro text for header
+                    intro_parts = []
+                    for elem in item.content:
+                        if isinstance(elem, DL):
+                            break
+                        if isinstance(elem, str):
+                            intro_parts.append(elem)
+
+                    intro_text = " ".join(intro_parts).strip()
+                    # Remove (1), (2) etc. prefix if present (using parsed absatz_num)
+                    if item.absatz_num and intro_text.startswith(
+                        f"({item.absatz_num})"
+                    ):
+                        intro_text = intro_text[len(f"({item.absatz_num})") :].strip()
+
+                    # Build header with intro text (but only if short enough)
+                    # Use max 50 chars for intro text in header, otherwise show in body
+                    MAX_HEADER_INTRO_LENGTH = 50
+                    skip_intro_in_body = False
+
+                    if intro_text and len(intro_text) <= MAX_HEADER_INTRO_LENGTH:
+                        header = f"{self.law_code} {enbez} Absatz {section_num} - {intro_text}"
+                        skip_intro_in_body = True
+                    else:
+                        header = f"{self.law_code} {enbez} Absatz {section_num}"
+                        skip_intro_in_body = False
+
+                    # Build paragraph reference for formatting
+                    paragraph_ref = f"{self.law_code} {enbez} Absatz {section_num}"
+
+                    # Format the P element
+                    formatted_lines = format_p_element(
+                        item,
+                        paragraph_ref,
+                        skip_intro=skip_intro_in_body,
+                    )
+
                     result = [
+                        header,
                         "=" * 70,
-                        f"{self.law_code} {enbez} Absatz {section_num}",
-                        "=" * 70,
-                        "",
-                        extract_text_from_p(item),
+                        "\n".join(formatted_lines),
                     ]
                     return "\n".join(result)
 

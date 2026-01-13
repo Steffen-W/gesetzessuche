@@ -133,19 +133,19 @@ Examples:
         law_to_load = args.gesetz
 
     # Load law document (auto-download if missing)
-    print(f"📖 Loading {law_to_load}...", end=" ", flush=True)
     documents = get_law(law_to_load, auto_download=True)
 
     if not documents:
-        print(" ❌")
-        print(f"\n❌ Law '{law_to_load}' not found!")
+        print(f"❌ Law '{law_to_load}' not found!")
         print("Run: gesetzessuche-download --essential")
         return 1
 
-    print(" ✓")
-
-    # Get law code from jurabk
+    # Get law code (short form) and title (long form)
     law_key = documents.get_jurabk()[0] if documents.get_jurabk() else law_to_load
+    law_title = documents.get_titel() or law_key
+
+    # Show loading message with long form
+    print(f"📖 {law_title}...  ✓")
 
     # Initialize search
     search = LawSearch(documents, law_key)

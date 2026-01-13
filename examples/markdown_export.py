@@ -97,13 +97,9 @@ class MarkdownConverter:
 
     def _process_paragraph_content(self, p: P, paragraph_num: str) -> None:
         """Process a paragraph element"""
-        # Extract absatz number if present
+        # Get absatz number from P element (extracted during parsing)
+        absatz_num = p.absatz_num
         text = p.raw_text or ""
-        absatz_match = text[:10].strip() if text else ""
-        absatz_num = None
-
-        if absatz_match.startswith("(") and ")" in absatz_match[:5]:
-            absatz_num = absatz_match[1 : absatz_match.index(")")]
 
         # Build reference
         if absatz_num:
@@ -113,8 +109,9 @@ class MarkdownConverter:
             paragraph_ref_plain = (
                 f"{self.gesetz_kuerzel} {paragraph_num} Absatz {absatz_num}"
             )
-            # Remove (1), (2) etc. from text
-            text = text[text.index(")") + 1 :].strip() if ")" in text[:10] else text
+            # Remove (1), (2) etc. prefix from text since we already have absatz_num
+            if text.startswith(f"({absatz_num})"):
+                text = text[len(f"({absatz_num})") :].strip()
         else:
             paragraph_ref = f"**{self.gesetz_kuerzel} {paragraph_num}**"
             paragraph_ref_plain = f"{self.gesetz_kuerzel} {paragraph_num}"
@@ -136,9 +133,9 @@ class MarkdownConverter:
                     intro_parts.append(elem)
 
             intro_text = " ".join(intro_parts).strip()
-            # Remove (1), (2) if present
+            # Remove (1), (2) etc. prefix if present (using parsed absatz_num)
             if absatz_num and intro_text.startswith(f"({absatz_num})"):
-                intro_text = intro_text[intro_text.index(")") + 1 :].strip()
+                intro_text = intro_text[len(f"({absatz_num})") :].strip()
 
             if intro_text:
                 self.output.append(f"{paragraph_ref} {intro_text}")

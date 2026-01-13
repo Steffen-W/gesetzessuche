@@ -3,6 +3,7 @@ XML Parser für deutsche Gesetzestexte
 Konvertiert gii-norm.dtd konforme XML-Dateien in Pydantic Models
 """
 
+import re
 import xml.etree.ElementTree as ET
 from datetime import date, datetime
 from pathlib import Path
@@ -424,10 +425,20 @@ class GesetzParser:
 
     def parse_p(self, elem: ET.Element) -> P:
         """Parst P-Element (Absatz)"""
+        raw_text = self._extract_raw_text(elem)
+
+        # Absatznummer direkt beim Parsen extrahieren
+        absatz_num = None
+        if raw_text:
+            match = re.match(r"^\s*\((\d+)\)", raw_text)
+            if match:
+                absatz_num = match.group(1)
+
         return P(
             id=elem.get("ID"),
+            absatz_num=absatz_num,
             content=self.parse_content_elements(elem),
-            raw_text=self._extract_raw_text(elem),
+            raw_text=raw_text,
         )
 
     def parse_revision(self, elem: ET.Element) -> Revision:

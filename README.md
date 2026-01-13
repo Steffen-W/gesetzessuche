@@ -1,6 +1,33 @@
 # Gesetzessuche
 
-Python-Bibliothek und MCP-Server für komfortablen Zugriff auf >6400 deutsche Bundesgesetze von [gesetze-im-internet.de](https://www.gesetze-im-internet.de).
+Python-Bibliothek und MCP-Server für komfortablen Zugriff auf deutsches Bundesrecht von [gesetze-im-internet.de](https://www.gesetze-im-internet.de).
+
+**Verfügbar:** >1500 Gesetze, >2900 Verordnungen, >900 Abkommen, >500 Bekanntmachungen (~6500 Dokumente)
+
+## Beispiele
+
+```bash
+$ gesetzessuche -r "BGB § 7"
+📖 Bürgerliches Gesetzbuch...  ✓
+
+BGB § 7 - Wohnsitz; Begründung und Aufhebung
+======================================================================
+
+(1) Wer sich an einem Orte ständig niederlässt, begründet an diesem Orte seinen Wohnsitz.
+
+(2) Der Wohnsitz kann gleichzeitig an mehreren Orten bestehen.
+
+(3) Der Wohnsitz wird aufgehoben, wenn die Niederlassung mit dem Willen aufgehoben wird, sie aufzugeben.
+```
+
+```bash
+$ gesetzessuche -r "BGB § 7 Absatz 1"
+📖 Bürgerliches Gesetzbuch...  ✓
+
+BGB § 7 Absatz 1
+======================================================================
+Wer sich an einem Orte ständig niederlässt, begründet an diesem Orte seinen Wohnsitz.
+```
 
 ## Schnellstart
 

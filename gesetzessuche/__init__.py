@@ -25,6 +25,11 @@ Utility Functions:
     - load_toc_index: Load TOC index from gii-toc.xml
     - find_law_in_toc: Find law in TOC by code
     - download_laws_batch: Batch download laws
+
+Formatting Functions:
+    - extract_text_from_elements: Extract text from content elements
+    - process_dl_list: Process definition lists with proper formatting
+    - format_p_element: Format a P element with lists and proper indentation
 """
 
 from .models import (
@@ -49,6 +54,11 @@ from .utils import (
     load_toc_index,
     parse_law_reference,
     save_law_mapping,
+)
+from .formatting import (
+    extract_text_from_elements,
+    process_dl_list,
+    format_p_element,
 )
 
 __all__ = [
@@ -77,4 +87,8 @@ __all__ = [
     "find_law_in_toc",
     "download_laws_batch",
     "parse_law_reference",
+    # Formatting Functions
+    "extract_text_from_elements",
+    "process_dl_list",
+    "format_p_element",
 ]

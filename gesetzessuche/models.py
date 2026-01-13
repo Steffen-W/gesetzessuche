@@ -245,6 +245,7 @@ class P(BaseModel):
     """Absatz"""
 
     id: Optional[str] = None
+    absatz_num: Optional[str] = None
     content: List["ContentElement"] = Field(default_factory=list)
     raw_text: Optional[str] = None
 
